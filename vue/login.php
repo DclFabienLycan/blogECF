@@ -1,3 +1,35 @@
+<?php
+
+require '../modele/pdo.php';
+
+if(session_status() == PHP_SESSION_NONE) {
+    
+    if(isset($_POST['login'])) {
+
+        /* on test si les champ sont bien remplis */
+        if(!empty($_POST['nom']) and !empty($_POST['prenom']) and !empty($_POST['password'])) {
+            
+            $connect = $pdo->prepare("SELECT * FROM utilisateur WHERE nomUtilisateur = :name AND prenomUtilisateur = :prenom");
+            $connect->bindParam(':name', $_POST['nom']);
+            $connect->bindParam(':prenom', $_POST['prenom']);
+            $connect->execute();
+            $user = $connect->fetch();
+            
+            if (password_verify($_POST['password'], $user->motDePasse)) {
+                session_start();
+                $_SESSION['auth'] = $user;
+                
+                if(!$user) {
+                    echo 'Mauvais identifiant ou mot de passe !';
+                } else {
+                    header('Location:../index.php');
+                }
+            }
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,7 +38,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/style.css">
-    <title>SignIn</title>
+    <title>Login</title>
 </head>
 <body>
     <header>
@@ -39,6 +71,25 @@
             </div>
         </nav>
     </header>
+    <form action="" method="POST">
+        <div class="container formulaire">
+            <div class="form-row">
+                <div class="col-sm-3 offset-md-2">
+                    <label for="" class="col-form-label">Nom :</label>
+                    <input type="text" class="form-control" name="nom" placeholder="Votre Nom" required>
+                </div>
+                <div class="col-sm-3">
+                    <label for="" class="col-form-label">Prénom :</label>
+                    <input type="text" class="form-control" name="prenom" placeholder="Votre Prénom" value="" required>
+                </div>
+                <div class="col-sm-3">
+                    <label for="" class="col-form-label">Mot de passe :</label>
+                    <input type="password" class="form-control" name="password" placeholder="Votre Mot de passe" value="" required>
+                </div>
+            </div>
+            <button type="submit" name="login" id="login" class="btn btn-outline-info offset-md-2 mt-2">Connexion</button>
+        </div>
+    </form>
         <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

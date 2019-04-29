@@ -8,7 +8,7 @@ if(session_status() == PHP_SESSION_NONE) {
 }
 
 // Appel de la BDD
-// require 'modele/pdo.php';
+require '../modele/pdo.php';
 ?>
 
 <!doctype html>
@@ -20,7 +20,7 @@ if(session_status() == PHP_SESSION_NONE) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <title>Blog</title>
 </head>
 <body>
@@ -32,18 +32,18 @@ if(session_status() == PHP_SESSION_NONE) {
             <div class="collapse navbar-collapse" id="collapsibleNavId">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                     <li class="nav-item active">
-                        <a class="nav-link" href="index.php">Accueil <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="../index.php">Accueil <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="vue/articles.php">Articles</a>
+                        <a class="nav-link" href="articles.php">Articles</a>
                     </li>
                     <?php if ($_SESSION['auth']){ ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Gestion</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownId">
                             <?php if($user->idRole == 2 || $user->idRole == 1){ ?>
-                                <a class="dropdown-item" href="vue/modifie.php">Modifier un article</a>
-                                <a class="dropdown-item" href="vue/proposition.php">Proposer un article</a>
+                                <a class="dropdown-item" href="modifie.php">Modifier un article</a>
+                                <a class="dropdown-item" href="proposition.php">Proposer un article</a>
                                 <?php if($user->idRole == 1){ ?>
                                 <a class="dropdown-item" href="#">Archiver un article</a>
                                 <?php } ?>
@@ -58,20 +58,37 @@ if(session_status() == PHP_SESSION_NONE) {
                 </form>
                 <div class="formBouton">
                     <?php if($_SESSION) { ?>
-                        <a name="logout" id="logout" class="btn btn-primary" href="controller/logout.php" role="button">Déconnexion</a>
+                        <a name="logout" id="logout" class="btn btn-primary" href="../controller/logout.php" role="button">Déconnexion</a>
                     <?php } else { ?>
-                        <a name="SignIn" id="register" class="btn btn-primary" href="vue/register.php" role="button">Inscription</a>
-                        <a name="Login" id="log" class="btn btn-primary" href="vue/login.php" role="button">Connexion</a>
+                        <a name="SignIn" id="register" class="btn btn-primary" href="register.php" role="button">Inscription</a>
+                        <a name="Login" id="log" class="btn btn-primary" href="login.php" role="button">Connexion</a>
                     <?php } ?>
                 </div>
             </div>
         </nav>
     </header>
-    <?php if ($user = $_SESSION['auth'] AND $_SESSION['auth']) { ?>
-    <h1>Vous êtes maintenant connecté en tant que <?= $user->prenomUtilisateur ?></h1>
-    <?php } else { ?>
-    <h1>Merci de vous connecter !</h1>
-    <?php } ?>
+    <main>
+        <div class="container articleAffiche">
+            <form action="" method="POST">
+                <div class="container formulaireArticle">
+                    <div class="form-row">
+                        <div class="col-sm-3 offset-md-3">
+                            <label for="" class="col-form-label">Nom :</label>
+                            <input type="text" class="form-control" name="nom" placeholder="Nom de l'article" required>
+                            <input type="hidden" value="<?= $user->idUtilisateur ?>" name="id">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-sm-6 offset-md-3">
+                            <label for="" class="col-form-label">Contenu de l'article :</label>
+                            <textarea name="contenuArticle" id="textMess" cols="30" rows="10" maxlength="500" placeholder=" Le contenu ici ..." required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" name="soumettre" id="sub" class="btn btn-outline-info offset-md-3 mt-2">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </main>
   
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -80,3 +97,17 @@ if(session_status() == PHP_SESSION_NONE) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
 </html>
+
+<?php 
+
+if(isset($_POST['soumettre'])) {
+
+    if(!empty($_POST['nom']) && !empty($_POST['contenuArticle'])) {
+
+        $article = $pdo->prepare("INSERT INTO article SET nomArticle = :nom, contenuArticle = :contenu, statut = '0', dateArticle = NOW(), archiver = '0', idUtilisateur = :id");
+        $article->bindParam(':nom', $_POST['nom']);
+        $article->bindParam(':contenu', $_POST['contenuArticle']);
+        $article->bindParam(':id', $_POST['id']);
+        $article->execute();
+    }
+}

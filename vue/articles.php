@@ -8,7 +8,7 @@ if(session_status() == PHP_SESSION_NONE) {
 }
 
 // Appel de la BDD
-// require 'modele/pdo.php';
+require '../modele/pdo.php';
 ?>
 
 <!doctype html>
@@ -20,7 +20,7 @@ if(session_status() == PHP_SESSION_NONE) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <title>Blog</title>
 </head>
 <body>
@@ -32,18 +32,18 @@ if(session_status() == PHP_SESSION_NONE) {
             <div class="collapse navbar-collapse" id="collapsibleNavId">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                     <li class="nav-item active">
-                        <a class="nav-link" href="index.php">Accueil <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="../index.php">Accueil <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="vue/articles.php">Articles</a>
+                        <a class="nav-link" href="#">Articles</a>
                     </li>
                     <?php if ($_SESSION['auth']){ ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Gestion</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownId">
                             <?php if($user->idRole == 2 || $user->idRole == 1){ ?>
-                                <a class="dropdown-item" href="vue/modifie.php">Modifier un article</a>
-                                <a class="dropdown-item" href="vue/proposition.php">Proposer un article</a>
+                                <a class="dropdown-item" href="modifie.php">Modifier un article</a>
+                                <a class="dropdown-item" href="proposition.php">Proposer un article</a>
                                 <?php if($user->idRole == 1){ ?>
                                 <a class="dropdown-item" href="#">Archiver un article</a>
                                 <?php } ?>
@@ -58,20 +58,40 @@ if(session_status() == PHP_SESSION_NONE) {
                 </form>
                 <div class="formBouton">
                     <?php if($_SESSION) { ?>
-                        <a name="logout" id="logout" class="btn btn-primary" href="controller/logout.php" role="button">Déconnexion</a>
+                        <a name="logout" id="logout" class="btn btn-primary" href="../controller/logout.php" role="button">Déconnexion</a>
                     <?php } else { ?>
-                        <a name="SignIn" id="register" class="btn btn-primary" href="vue/register.php" role="button">Inscription</a>
-                        <a name="Login" id="log" class="btn btn-primary" href="vue/login.php" role="button">Connexion</a>
+                        <a name="SignIn" id="register" class="btn btn-primary" href="register.php" role="button">Inscription</a>
+                        <a name="Login" id="log" class="btn btn-primary" href="login.php" role="button">Connexion</a>
                     <?php } ?>
                 </div>
             </div>
         </nav>
     </header>
-    <?php if ($user = $_SESSION['auth'] AND $_SESSION['auth']) { ?>
-    <h1>Vous êtes maintenant connecté en tant que <?= $user->prenomUtilisateur ?></h1>
-    <?php } else { ?>
-    <h1>Merci de vous connecter !</h1>
-    <?php } ?>
+    <main>
+        <?php
+            $afficher = $pdo->query("SELECT * FROM article NATURAL JOIN utilisateur WHERE statut = '1'");
+            $afficher->execute();
+            $afficherResultat = $afficher->fetchAll();
+
+            foreach($afficherResultat as $afficherResultats) { ?>
+                <div class="afficherResultatArticle mx-auto">
+                    <div class="container articleAffiche">
+                        <div class="row mx-auto">
+                            <div class="col-md-6 mx-auto mt-2">
+                                <div class="card">
+                                <div class="card-body">
+                                    <h3 class="card-title"><?= $afficherResultats->nomArticle ?></h3>
+                                    <p class="card-text">Article publié le : <?= $afficherResultats->dateArticle ?></p>
+                                    <p class="card-text"><?= $afficherResultats->contenuArticle ?></p>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="card-text">Cette article vous a été prosposé par : <?= $afficherResultats->prenomUtilisateur ?></p>
+                    </div>
+                </div>
+            <?php } ?>
+    </main>
   
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
