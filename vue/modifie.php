@@ -3,8 +3,8 @@
 // On démarre une session si aucune n'est présente
 if(session_status() == PHP_SESSION_NONE) {
     session_start();
-    $user = new stdClass();
-    $user = $_SESSION['auth'];
+    // $user = new stdClass();
+    // $user = $_SESSION['auth'];
 }
 
 // Appel de la BDD
@@ -41,10 +41,10 @@ require '../modele/pdo.php';
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Gestion</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownId">
-                            <?php if($user->idRole == 2 || $user->idRole == 1){ ?>
+                            <?php if($_SESSION['auth']->idRole == 2 || $_SESSION['auth']->idRole == 1){ ?>
                                 <a class="dropdown-item" href="modifie.php">Modifier un article</a>
                                 <a class="dropdown-item" href="proposition.php">Proposer un article</a>
-                                <?php if($user->idRole == 1){ ?>
+                                <?php if($_SESSION['auth']->idRole == 1){ ?>
                                 <a class="dropdown-item" href="#">Archiver un article</a>
                                 <?php } ?>
                             <?php } ?>
@@ -57,7 +57,7 @@ require '../modele/pdo.php';
                     <button class="btn btn-outline-success my-2 my-sm-0 boutonSearch" type="submit">Search</button>
                 </form>
                 <div class="formBouton">
-                    <?php if($_SESSION) { ?>
+                    <?php if(isset($_SESSION['auth'])) { ?>
                         <a name="logout" id="logout" class="btn btn-primary" href="../controller/logout.php" role="button">Déconnexion</a>
                     <?php } else { ?>
                         <a name="SignIn" id="register" class="btn btn-primary" href="register.php" role="button">Inscription</a>
@@ -70,8 +70,8 @@ require '../modele/pdo.php';
     <main>
         <div class="container afficherArticle mb-4 pt-2">
             <?php
-                if($user->idRole == 2) {
-                    $id = $user->idUtilisateur;
+                if($_SESSION['auth']->idRole == 2) {
+                    $id = $_SESSION['auth']->idUtilisateur;
                     $resultat = $pdo->prepare("SELECT * FROM article NATURAL JOIN utilisateur WHERE statut = '0' AND archiver = '0' AND idUtilisateur = :id");
                     $resultat->bindParam(':id', $id);
                     $resultat->execute();
@@ -106,7 +106,7 @@ require '../modele/pdo.php';
                         </div>
                     </div>
                     <button type="submit" name="modifier" id="sub" class="btn btn-outline-info offset-md-3 mr-2 mt-2">Modifier</button>
-                    <?php if($user->idUtilisateur == 1){ ?>
+                    <?php if($_SESSION['auth']->idUtilisateur == 1){ ?>
                     <button type="submit" name="publier" id="sub" class="btn btn-outline-info mr-2 mt-2">Publier</button>
                     <button type="submit" name="supprimer" id="sub" class="btn btn-danger mr-5 mt-2">Supprimer</button>
                     <button type="submit" name="archiver" id="sub" class="btn btn-danger mt-2">Archiver</button>

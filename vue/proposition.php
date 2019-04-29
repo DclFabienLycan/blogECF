@@ -3,8 +3,8 @@
 // On démarre une session si aucune n'est présente
 if(session_status() == PHP_SESSION_NONE) {
     session_start();
-    $user = new stdClass();
-    $user = $_SESSION['auth'];
+    // $user = new stdClass();
+    // $user = $_SESSION['auth'];
 }
 
 // Appel de la BDD
@@ -37,14 +37,14 @@ require '../modele/pdo.php';
                     <li class="nav-item">
                         <a class="nav-link" href="articles.php">Articles</a>
                     </li>
-                    <?php if ($_SESSION['auth']){ ?>
+                    <?php if (isset($_SESSION['auth'])){ ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Gestion</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownId">
-                            <?php if($user->idRole == 2 || $user->idRole == 1){ ?>
+                            <?php if($_SESSION['auth']->idRole == 2 || $_SESSION['auth']->idRole == 1){ ?>
                                 <a class="dropdown-item" href="modifie.php">Modifier un article</a>
                                 <a class="dropdown-item" href="proposition.php">Proposer un article</a>
-                                <?php if($user->idRole == 1){ ?>
+                                <?php if($_SESSION['auth']->idRole == 1){ ?>
                                 <a class="dropdown-item" href="#">Archiver un article</a>
                                 <?php } ?>
                             <?php } ?>
@@ -57,7 +57,7 @@ require '../modele/pdo.php';
                     <button class="btn btn-outline-success my-2 my-sm-0 boutonSearch" type="submit">Search</button>
                 </form>
                 <div class="formBouton">
-                    <?php if($_SESSION) { ?>
+                    <?php if(isset($_SESSION['auth'])) { ?>
                         <a name="logout" id="logout" class="btn btn-primary" href="../controller/logout.php" role="button">Déconnexion</a>
                     <?php } else { ?>
                         <a name="SignIn" id="register" class="btn btn-primary" href="register.php" role="button">Inscription</a>
@@ -75,7 +75,7 @@ require '../modele/pdo.php';
                         <div class="col-sm-3 offset-md-3">
                             <label for="" class="col-form-label">Nom :</label>
                             <input type="text" class="form-control" name="nom" placeholder="Nom de l'article" required>
-                            <input type="hidden" value="<?= $user->idUtilisateur ?>" name="id">
+                            <input type="hidden" value="<?= $_SESSION['auth']->idUtilisateur ?>" name="id">
                         </div>
                     </div>
                     <div class="form-row">

@@ -3,8 +3,9 @@
 // On démarre une session si aucune n'est présente
 if(session_status() == PHP_SESSION_NONE) {
     session_start();
-    $user = new stdClass();
-    $user = $_SESSION['auth'];
+    // $user = new stdClass();
+    // $user = $_SESSION['auth'];
+    // var_dump($_SESSION);
 }
 
 // Appel de la BDD
@@ -37,14 +38,14 @@ if(session_status() == PHP_SESSION_NONE) {
                     <li class="nav-item">
                         <a class="nav-link" href="vue/articles.php">Articles</a>
                     </li>
-                    <?php if ($_SESSION['auth']){ ?>
+                    <?php if (isset($_SESSION['auth'])){ ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Gestion</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownId">
-                            <?php if($user->idRole == 2 || $user->idRole == 1){ ?>
+                            <?php if($_SESSION['auth']->idRole == 2 || $_SESSION['auth']->idRole == 1){ ?>
                                 <a class="dropdown-item" href="vue/modifie.php">Modifier un article</a>
                                 <a class="dropdown-item" href="vue/proposition.php">Proposer un article</a>
-                                <?php if($user->idRole == 1){ ?>
+                                <?php if($_SESSION['auth']->idRole == 1){ ?>
                                 <a class="dropdown-item" href="#">Archiver un article</a>
                                 <?php } ?>
                             <?php } ?>
@@ -57,7 +58,7 @@ if(session_status() == PHP_SESSION_NONE) {
                     <button class="btn btn-outline-success my-2 my-sm-0 boutonSearch" type="submit">Search</button>
                 </form>
                 <div class="formBouton">
-                    <?php if($_SESSION) { ?>
+                    <?php if(isset($_SESSION['auth'])) { ?>
                         <a name="logout" id="logout" class="btn btn-primary" href="controller/logout.php" role="button">Déconnexion</a>
                     <?php } else { ?>
                         <a name="SignIn" id="register" class="btn btn-primary" href="vue/register.php" role="button">Inscription</a>
@@ -67,8 +68,8 @@ if(session_status() == PHP_SESSION_NONE) {
             </div>
         </nav>
     </header>
-    <?php if ($user = $_SESSION['auth'] AND $_SESSION['auth']) { ?>
-    <h1>Vous êtes maintenant connecté en tant que <?= $user->prenomUtilisateur ?></h1>
+    <?php if (isset($_SESSION['auth'])) { ?>
+    <h1>Vous êtes maintenant connecté en tant que <?= $_SESSION['auth']->prenomUtilisateur ?></h1>
     <?php } else { ?>
     <h1>Merci de vous connecter !</h1>
     <?php } ?>
